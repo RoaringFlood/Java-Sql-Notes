@@ -1,0 +1,1196 @@
+									*****Örnek İsimlendirmeler*****
+Bind = b_name
+Constant = c_name
+Cursor = cur_name
+Exception = e_name
+File = f_name
+Parametre = p_name
+Record = rec_name
+Type = type_name
+Variable = v_name
+									*****İLK ÖRNEK*****
+									*******************
+
+SET serveroutput ON
+DECLARE
+    ondalikli_sayi number(6,2):= 8500.25; --Toplam 6 basamaklı : Ondalık kısmı 2 basamak
+    maas1 number;
+    maas2 number;
+    toplam number;
+    tarih date;
+    ad varchar2(20);
+    sehir varchar2(20) := 'İstanbul';  --20 Karakter sınırlı string
+    ulke varchar2(20) default 'TR';  -- default değer ayarlama
+    plaka number(2) not null := 30; -- not_null olarak tanımlama
+    bool_veri boolean := True; --true/false değer
+    seri constant number := 2233; --değiştirilemez sabit değer
+	v_sayac PLS_INTEGER := dbms_random.value(50,100); -- belirli aralıkta random sayı atamayı sağlar
+BEGIN
+    select maas into maas1 from personel where personel_id = 5006; --seçilen değer 'maas1' e yüklendi
+    maas2 := 5000;
+    toplam := maas1 + maas2;
+    dbms_output.put_line('Hello World ' || toplam || ' ' || ulke);
+    dbms_output.put_line(ondalikli_sayi);
+    
+    --Adı ve Maaşı Getirip Yazdıran Sorgu
+    select maas, ad into maas1, ad from personel where personel_id = 5020;
+    dbms_output.put_line('Adı :'|| ad || ' Maaşı: ' || maas1);
+    
+    --Min ve Max Maaşı Getiren Sorgu
+    select min(maas), max(maas) into maas1, maas2 from personel;
+    dbms_output.put_line('Min Maaş: ' || maas1 || ' Max Maaş :' || maas2);
+        
+END;
+
+			*****TABLO KOPYALAMA*****
+Örnek :		CREATE TABLE personel_kopya AS SELECT personel_id, ad, soyad FROM personel WHERE 1=0
+
+			*****Yeni Satıra Geçmek*****
+Örnek :		c_yeni_satir varchar2(6) := chr(13) || chr(10); -- chr(13) ve chr(10) un birleşimi yeni satıra geçilmesini sağlar
+																--Where ' i bu şekilde yapınca veri çekmesini engelliyoruz.
+
+									*****VERİ TİPLERİ*****
+									**********************
+https://docs.oracle.com/en/database/oracle/oracle-database/19/lnpls/plsql-data-types.html								
+		***String***
+v_char    CHAR(10); --Maks: 32767 byte, Default: 1byte !! Sabit Uzunlukludur !!
+v_varchar VARCHAR2(10); --Maks: 32767 byte, Default: n/a
+v_clob    CLOB; --Maks: 128 terabyte
+
+		****String Ayracı**** --String İfadedeki tırnaklar vb. karakterler için kaçış yöntemleri
+v_etkinlik := 'Ahmet''in doğum günü';  
+v_etkinlik := q'!Ahmet'in doğum günü!';
+v_etkinlik := q'[Ahmet'in doğum günü]';
+		
+		****Numbers****
+		
+ondalikli_sayi NUMBER(6,2):= 8500.25; --(precision, scale)Toplam 6 basamaklı : Ondalık kısmı 2 basamak 
+ondalikli_sayi PLS_INTEGER:= 8500; --Number'a göre daha performanslı ve belirli bir aralıkta çalışır
+ondalikli_sayi SIMPLE_INTEGER:= 8500; --pls_integer gibi ama aralık dışındada çalışabilir
+v_boolean BOOLEAN := True;
+
+		****Tarih-Zaman(Date)****
+		
+Date : Tarih bilgisinin yanında zaman bilgiside tutar
+Timestamp : Yıl, ay, gün, saat, dakika, saniye, kesirli saniye
+Timestamp with time ZONE : timestamp ve TIMEZONE_HOUR, TIMEZONE_MINUTE, TIMEZONE_REGION verilerinide tutar
+timestamp with local time zone 
+interval year to month : yıl ve ay arasındaki zaman aralıklarını hesaplarken kullanılır
+interval day to second : günden saniyeye kadar olan zaman aralığı gerekiyorsa kullanılmalı
+
+-- Tarih := sysdate; -> diyerek sistemin o anki tarihini alabiliriz
+
+		DECLARE
+			d_time Timestamp with time ZONE := sysdate;
+		begin
+			dbms_output.put_line(d_time);
+		end;
+		-- 22-DEC-22 11.17.58.000000 PM ASIA/ISTANBUL
+
+		declare  
+			v_surel interval year to month := '03-02';
+			v_sure2 interval year to month := interval '6' month;
+			v_sure3 interval day to second := '40 10:20:10';
+			v_sure4 interval day to second := interval '5 5:5:5' day to second;
+
+		begin
+			dbms_output.put_line(to_char(sysdate, 'dd.mm.yyyy hh24:mi:ss'));
+			dbms_output.put_line(sysdate + v_surel);
+			dbms_output.put_line(sysdate + v_sure2);
+			dbms_output.put_line(to_char(sysdate + v_sure3, 'dd.mm.yyyy hh24:mi:ss'));
+			dbms_output.put_line(to_char(sysdate + v_sure4, 'dd.mm.yyyy hh24:mi:ss'));
+		end;
+
+					/*	22.12.2022 23:25:27
+						22-FEB-26
+						22-JUN-23
+						01.02.2023 09:45:37
+						28.12.2022 04:30:32 */
+Not :		alter session set nls_date_format = 'dd.mm.yyyy'; -- yaparak oturumdaki tarih yazı düzenini değiştirebiliriz
+			alter session set nls_date_language = 'Turkish'; -- tarih yazım dilini değiştirme
+			
+			
+			****Veri Tipi Dönüştürme****
+
+to_number(v_maas) : veriyi number a dönüştürür
+to_char()
+to_date()
+
+										***** %TYPE *****
+bir değişken tanımlarken, tablodaki sütunun veri tipi ile aynı olsun manasında kullanılabilir
+%type ile tanımlanan değişkenler otomatik olarak değşişken türüne uyum sağlar
+!!! -Not Null- olarak tanımlanan constraint kolonlar için %type kullanılamaz
+
+					SET serveroutput ON
+					DECLARE
+						v_maas personel.maas%type;
+						v_ad personel.ad%type;
+						v_tarih personel.giris_tarihi%type;
+					BEGIN
+						SELECT maas, ad, giris_tarihi
+						INTO v_maas, v_ad, v_tarih
+						FROM personel 
+						WHERE personel_id = 5010;
+						
+						dbms_output.put_line('Maaş :'||v_maas);
+						dbms_output.put_line('Ad :'||v_ad);
+						dbms_output.put_line('Tarih :'||v_tarih);
+						
+					END;
+
+										****BOOLEAN****
+
+					DECLARE
+						v_per_maas number;
+						v_max_maas number := 5000;
+						v_uygunluk boolean := False;
+						v_personel_id pls_integer := 5005;
+					BEGIN
+						SELECT maas into v_per_maas
+						FROM personel
+						WHERE personel_id = v_personel_id;
+
+						IF v_per_maas < v_max_maas THEN
+							v_uygunluk := True;
+						END IF;
+
+						IF v_uygunluk = True THEN
+							dbms_output.put_line('Doğru');
+						ELSE
+							dbms_output.put_line('Yanlış');
+						END IF;
+					END;
+
+									*****LOB VERİLERİ*****
+									**********************
+CLOB : büyük karakter dizelerinden oluşur
+BLOB : içinde binary veri DB tarafından yorumlanmadan saklanır
+BFILE : sistemde tutulan resim vb. dosyaların konumlarını saklamak için kullanılır
+NCLOB : national language character LOB
+		--- bir blokta 4GB'a kadar veri saklarlar
+
+
+
+									*****COLLECTIONS VERİ TİPİ*****
+Bir tablonun sütunu gibi dikey şekilde saklanır(Aynı veri tiplerini saklar)
+Her bir Elemana 'Elements' denir
+Her bir elemente unique bir değer ile ulaşılır
+List ve array gibi düşünülebilir
+-- Associative Arrays, Nested Tables, Varray Types
+
+									****Bind Değişkenler**** (Host Değişkenler de denir)
+Variable kelimesi ile oluşturulur
+SQL ve PL/SQL de kullanılır
+Performans artışı saklar
+!!! DECLARE Bloğunda tanımlanmazlar
+ -- select * from personel where personel_id = :b_id; -> şeklinde yapılan sorgular tekrarlı sorgularda büyük performans artışı sağlar
+
+					variable b_sonuc number
+					variable b_unvan varchar2(20)
+					set autoprint on
+					declare
+						v_uzman varchar2(20) := '&unvan';
+					begin
+						select sum(maas) into :b_sonuc
+						from personel where unvan = v_uzman;
+						
+						select unvan into :b_unvan from personel
+						where personel_id = 5000;
+
+					end;
+					/
+					select ad, soyad from personel where personel_id = '&personel';
+					select ad, soyad from personel where unvan = :b_unvan;
+					
+					
+								*****PL/SQL İÇİNDE KULLANILABİLEN SQL FONKSİYONLARI*****
+								********************************************************
+	--Max, Min gibi grup fonksiyonları ve DECODE fonksiyonu kullanılamaz							
+				DECLARE
+					v_deger NUMBER := 1234.567;
+					v_str   VARCHAR2(50) := 'PL/SQL egitimi icin doğru yerdesiniz.';
+				BEGIN
+
+				dbms_output.put_line(instr(v_str, 'SQL')); --istenilen indexi bulma
+				dbms_output.put_line(concat ('Tuncay ', 'Tiryaki')); --stringleri birleştirme
+				dbms_output.put_line(to_char(v_deger)); --char'a dönüştürme
+				dbms_output.put_line(lower(v_str)); --karakterleri küçük yazma
+				dbms_output.put_line(substr(v_str, 8, 7)); --8. indexten itibaren 7 karakter alır
+				dbms_output.put_line(replace(v_str, 'dogru', 'en dogru ')); -- v_str içindeki 'doğru' yerine 'en doğru' yazar
+				dbms_output.put_line(round(v_deger,2)); -- virgülden sonraki 2. basamağa duyarlı şekilde yuvarlar
+				dbms_output.put_line(last_day(sysdate)); -- bulunduğumuz ayın son gününü verir
+
+				END;
+								*****SEQUENCE*****
+								******************
+	-- alter sequence serial restart start with 1; SEQUENC İ SIFIRLAMAK İÇİN
+				CREATE SEQUENCE sq_temp
+				START WITH 1 
+				INCREMENT BY 1;
+
+				DECLARE
+					v_seq_number number;
+					
+				BEGIN
+					v_seq_number := sq_temp.nextval;
+					dbms_output.put_line('Sıra numarası :'|| v_seq_number);
+				END;
+
+								*****NESTED (İÇ İÇE) BLOKLAR*****
+								*********************************
+								
+				declare
+					v_sayi1 number := 123;
+					v_sayi2 number := 456;
+				begin
+					declare
+						v_carpim number;
+					begin
+						v_carpim := v_sayi1 * v_sayi2;
+						dbms_output.put_line('Çarpım :' || v_carpim);
+					end;
+					
+					declare
+						v_toplam number;
+					begin
+						v_toplam := v_sayi1 + v_sayi2;
+						dbms_output.put_line('Toplam :' || v_toplam);
+					end;
+				end;
+
+		**** QUALIFIER KULLANIMI **** -- bunun sayesinde dış blokta tanımlanmış değişkenlere blok adı verilerek erişim sağlanabilir
+		
+			begin <<dis_blok>>
+			declare
+				v_sayi number := 5;
+			begin
+				dbms_output.put_line(v_sayi);
+				
+				declare
+					v_sayi number := 10;
+				begin
+					dbms_output.put_line(v_sayi);
+					dbms_output.put_line(dis_blok.v_sayi);
+				end;
+			end;
+			end dis_blok;
+			
+		****PL/SQL OPERATÖRLERİ****
+** = üslü sayı işlemi
+NOT, AND, OR = mantıksal işlemler
+IS NULL, IN, LIKE, BETWEEN = karşılaştırma işlemleri		
+-- ve benzeri öperatörleri barındırmaktadır.
+ÖRNEK =	v_deger_dogru := maas between 1000 and 1500;
+		v_gecerlimi := (giris_tarihi is not null);
+		if v_deger is not null then
+		
+								*****PL/SQL İÇİNDE SQL FONKSİYONLARI KULLANILANMA *****
+								********************************************************
+SELECT -> INTO ifadesi mutlaka gerekli ve sorgu tek satırlık sonuç döndürmeli
+Örnek : SELECT ad||' '||soyad into v_adsoyad from personel where personel_id =5007;
+
+		****PL/SQL DML****
+--Unique kolon değerleri için Sequence kullanılabilir
+--DML komut çalıştırıldıktan sonra rollback veya commit yapılması unutulmamalıdır
+
+**INSERT**
+			DECLARE
+				v_max_id number;
+			BEGIN
+
+				SELECT MAX(dept_id) INTO v_max_id FROM departman;
+				
+				INSERT INTO departman (dept_id, dept_ismi) 
+				VALUES (v_max_id+1 , 'Yeni departman');
+				
+				commit;
+			END;	
+**UPDATE**
+			UPDATE personel set maas = maas * 1.21 WHERE unvan = 'MÜHENDİS'; -- Tüm maaşlara %21 zam yapar
+			commit;
+**DELETE**
+			DELETE FROM personel WHERE personel_id = v_personel_id;
+			commit;
+			
+									*****CURSOR*****
+									****************
+--Select yada DML İşlemlerinin gerçekleştiği belleği tutan pointerları saklar
+-- Implicit : PL/SQL tarafından oluşturulan ve yönetilenlerdir. Direk erişim sağlanamaz
+-- Explicit : Yazılımcı tarafından oluşturulup yönetilir. SQL içindeki her bir satıra doğrudan erişebilir. DECLARE de tanımlanır.
+				
+				****IMPLICIT****
+--!!!! SELECT TEN KAYIT DÖNMEZSE, SQL%NOTFOUND İLE YAKALAYAMAYIZ VE HATA ALIRIZ !!!!
+SQL%FOUND : BOOLEAN -> EN AZ BİR KAYIT GELMİŞTİR
+SQL%NOTFOUND : BOOLEAN -> BİR KAYIT DAHİ GELMEMİŞTİR
+SQL%ROWCOUNT : INTEGER -> SQL DEN DÖNEN KAYIT SAYISIDIR  -- En son çalıştırmış olduğumuz SQL deki etkilenen kayıt sayısını verir.
+
+Örnek : 	DECLARE
+				v_sayi NUMBER;
+			BEGIN
+				UPDATE konum SET konum_adi = 'İstanbul Avcılar' WHERE konum_id = 5;
+				
+				v_sayi := SQL%ROWCOUNT --Etkilenen kayıtların adetini döndürür
+				
+				IF SQL%FOUND THEN --Etkilenen kayıt varsa TRUE döndürür
+					dbms_output.put_line('Etkilenen kayıt sayısı :' || v_sayi);
+				ELSE
+					dbms_output.put_line('Kayıt bulunamadı');
+				END IF;
+			END;
+			
+			
+			
+											*****IF - ELSIF - ELSE*****
+											***************************
+
+	IF !!condition!! THEN
+		*statements*;
+	ELSIF !!condition!! THEN
+		*statements*;
+	ELSE
+		*statements*;
+	END IF;
+
+											*****CASE - Karşılaştırma İfadesi*****
+											**************************************
+-- 2 farklı kullanımı vardır. Selector kullanarak aldığı değerlerin değerlendirilmesi ve farklı birçok şartın değerlendirilmesi.			
+
+Örnek :	DECLARE  -- Birden fazla şartın değerlendirilmesi sonucunda doğru olan aşamadaki değer v_hava ya atanır.
+			v_derece number := &derece;
+			v_hava varchar2(20);
+		BEGIN
+			v_hava :=
+				CASE
+					WHEN v_derece < 0 THEN 'Çok Soğuk'
+					WHEN v_derece BETWEEN 0 AND 15 THEN 'Soğuk'
+					WHEN v_derece BETWEEN 16 AND 25 THEN 'Ilık'
+					ELSE 'Sıcak'
+				END;
+			dbms_output.put_line('Sıcaklık :' || v_derece || ' Hava Durumu :' || v_hava);
+		END;
+
+Örnek : DECLARE  -- Seçiçi olarak kullandığımız değer ile uyuşan aşamadaki sonucumuz v_plaka ya atanır.
+			v_plaka number := 34;
+			v_sehir varchar2(20);
+		BEGIN
+			v_sehir :=
+				CASE v_plaka
+					WHEN 34 THEN 'İSTANBUL'
+					WHEN 37 THEN 'KASTAMONU'
+					ELSE 'BİLİNMİYOR'
+				END;
+			dbms_output.put_line('Şehirimiz : ' || v_sehir);
+		END;
+
+Örnek : DECLARE   -- Bu örnekte değer atamalarını direk CASE lerin içinde yapıyoruz
+			v_plaka number := 34;
+			v_sehir varchar2(20);
+		BEGIN
+			CASE v_plaka
+				WHEN 34 THEN v_sehir := 'İSTANBUL'
+				WHEN 37 THEN v_sehir := 'KASTAMONU'
+				ELSE v_sehir := 'BİLİNMİYOR'
+			END;
+			dbms_output.put_line('Şehirimiz : ' || v_sehir);
+		END;
+
+
+											*****DÖNGÜLER (LOOPS)*****
+											***************************
+Basic : Exit şartı gelesiye kadar çalışır. En az bir kere çalıştırılır.
+While : Bir şartın gerçekleşme durumuna göre tekrar eder
+For : Belirli bir sayıya kadar tekrar eder
+
+Basic Loop Örnek : 	DECLARE
+						v_sayac PLS_INTEGER := 0;
+					BEGIN    
+						LOOP
+							v_sayac := v_sayac + 1;
+							dbms_output.put_line(v_sayac);
+							EXIT WHEN v_sayac = 10;
+						END LOOP;    
+					END;
+
+
+
+While Örnek : 		DECLARE
+						v_grupsayisi number := 0;
+						v_deger number := 10000;
+						v_limit integer := 23;
+						islemkontrol boolean := false;
+					BEGIN    
+						WHILE islemkontrol = false LOOP
+							v_grupsayisi := v_grupsayisi + 1;
+							IF v_deger < v_limit THEN
+								islemkontrol := True;
+							ELSE
+								v_deger := v_deger - v_limit;
+							END IF;
+							-- EXIT WHEN islemkontrol := True;   *** While içindede çıkış için kullanılabilir
+						END LOOP;
+						dbms_output.put_line('Limit :' || v_limit);
+						dbms_output.put_line('Grup Sayısı :' || v_grupsayisi);
+					END;
+
+For Örnek : 		DECLARE
+						v_str varchar2(40) := 'Merhaba';
+					BEGIN
+					  --for i in reverse 1..5 LOOP diyerek tersten şekilde sayma işlemine başlayabiliyoruz (5->4->3->...)
+						for i in 1..length(v_str) LOOP
+							dbms_output.put_line(substr(v_str,i,1));
+						END LOOP;
+					END;
+
+					
+For Örnek 2 : 		DECLARE
+						v_min_id departman.dept_id%type;
+						v_dep_ismi departman.dept_ismi%type;
+					BEGIN
+						SELECT MIN(dept_id) INTO v_min_id FROM departman;
+						
+						FOR i IN 0..9 LOOP
+							SELECT dept_ismi INTO v_dep_ismi FROM departman 
+							  WHERE dept_id = v_min_id + i;
+							dbms_output.put_line(v_min_id + i || ': Departman İsmi :' || v_dep_ismi);
+						END LOOP;
+					END;
+			
+		****DÖNGÜLERDE LABEL KULLANIMI****
+-- EXIT WHEN ifadesi ile hangi LABEL etiketine sahip döngüden çıkılması istendiğini belirtebiliriz.
+-- Alttaki örnekde 'EXIT dis_dongu' dediğimiz için, 'j' değerimiz ilk 3 olduğunda tüm döngülerden çıkmış olur 
+		BEGIN 
+			<<dis_dongu>>
+			FOR i IN 1..3 LOOP 
+				<<ic_dongu>>
+				FOR j IN 1..4 LOOP
+					dbms_output.put_line(i ||' '||j);
+					EXIT dis_dongu WHEN j = 3;
+				END LOOP ic_dongu;   
+			END LOOP dis_dongu;
+		END;
+		
+		
+				****DÖNGÜLERDE CONTINUE KULLANIMI****
+				
+-- Bir sonraki döngü değerinden devam edilmesini sağlar.
+-- Kontrol bir sonraki döngü elemanına bırakılır veya döngüden çıkılır.
+-- Kendisindne sonra gelen tüm kod bloğunu geçer ve döngüye elemanına geçer.
+
+-- Aşağıdaki örnekte çift sayıları yazdıran bir FOR döngüsü tanımladık
+Örnek : 	BEGIN 
+				FOR sayac IN 1..20 LOOP
+					IF MOD(sayac, 2) = 1 THEN --Sayımız tekse LOOP'un başına dön
+						-- Continue ifadesi çalışmadan önce burada başka işlemler tanımlanabilir.
+						CONTINUE;
+					END IF;
+					dbms_output.put_line(sayac);
+				END LOOP;
+			END;
+
+Continue When : Yukarıdaki örnekteki IF bloğu üzerinden örnek vericek olursak, tek satırlık işlemlerimiz için kullanılabilir.
+	Eğer döngüye devam etmeden önce başka işlemler yapılmak isteniyorsa, IF bloğu kullanılmalıdır.
+	
+	Örnek : CONTINUE WHEN MOD(sayac,2) = 0;
+
+Continue İfadesinin Label ile kullanımı : -- İç içe olan döngülerde, istenilen döngüye CONTINUE yapabilmemizi sağlar.
+	
+	Örnek : CONTINUE dis_dongu WHEN MOD(sayac,2) = 0;
+	
+
+									*****RECORD VERİ TİPİ*****
+									**************************
+--Bir tablo gibi yatay şekilde sıralanır (Birden fazla veri tipi desteklenir)
+--Default değer ve Not NULL atanabilir.
+--İlk olarak Record tipinde bir Type tanımlanır. Sonrasında ise bu record tipine değişken tanımlanır.
+--Sahip oldukları her bileşene field denir.
+	record_name.field_name şeklinde ulaşılır
+Örnek 1 :
+					DECLARE
+						TYPE type_perso IS RECORD
+							(
+								adi varchar2(20),
+								soyadi personel.soyad%type,
+								maas number NOT NULL := 500
+							);
+						rec_personel type_perso; --rec_personel adında ve yukarıdaki tipte bir record oluşturduk
+					BEGIN
+						rec_personel.adi := 'Yalçın';
+						rec_personel.soyadi := 'Yetginoğlu';
+						rec_personel.maas := 5000;
+					END;
+
+Örnek 2 :
+					DECLARE
+						TYPE type_perso IS RECORD
+							(
+								ad personel.ad%type,
+								soyad personel.soyad%type,
+								maas personel.maas%type
+							);
+						rec_personel type_perso; --rec_personel adında ve yukarıdaki tipte bir record oluşturduk
+					BEGIN
+						--!!!! Alttaki kullanımda, Recordumuzla eşleşen çekmek istediğimiz sütunlar 
+						--						doğru sırada olduğu sürece otomatikman yerini bulur
+						SELECT ad, soyad, maas INTO rec_personel FROM personel WHERE personel_id = 5010;
+					END;
+					
+								*****NESTED RECORDS*****
+				DECLARE
+					TYPE adres_type IS RECORD
+						(
+							sehir varchar2(20),
+							ulke varchar2(20)
+						);
+					TYPE musteri_type IS RECORD
+						(
+							ad_soyad varchar2(30),
+							adres adres_type  --Recordumuzun içinde, yukarıda tanımlanan record türünde bir veri tanımladık.
+						);
+					v_musteri musteri_type;
+				BEGIN
+					v_musteri.ad_soyad := 'Yalçın Yetginoğlu';
+					v_musteri.adres.sehir := 'İstanbul';  -- İç içe olan recordların ulaşımı bu şekildedir.
+					v_musteri.adres.ulke := 'Türkiye';
+				END;
+
+								***** %ROWTYPE *****
+								********************
+-- Bir tablo veya view daki kolonların veri tiplerini tek bir değişkene atar
+-- Bu değişkendeki alan isimleri, tablodaki ile aynıdır.
+-- Veri aktarmak için 'Select' veya 'Fetch' kullanılır.
+-- Recordun çalışma mantığı ile çalışır ve çağrılır.
+-- Elle tanımlanmış aynı sırada ve veri tipine sahip record değişkenler ile atama yapılabilir.
+
+Örnek : 	DECLARE
+					v_perso personel%ROWTYPE -- personel tablosundaki tüm columnların veri tipi aktarıldı.
+				
+Örnek : 		DECLARE
+					v_perso personel%ROWTYPE;
+				BEGIN
+					SELECT * INTO v_perso FROM personel  -- 'SELECT * ' şeklinde tüm verileri seçmeliyiz yoksa hata verir
+					  WHERE personel_id = 5060;
+					dbms_output.put_line(v_perso.ad || ' ' ||
+										 v_perso.soyad);
+				END;
+INSERT Örneği : 
+				INSERT INTO personel VALUES v_perso;  -- oluşturduğumuz recorddaki değerleri tabloya ekledik.
+				COMMIT;
+UPDATE Örneği :
+				UPDATE personel SET ROW = v_perso WHERE personel_id = 5020;
+				COMMIT;
+				
+									*****COLLECTIONS VERİ TİPİ*****
+									*******************************
+--Bir tablonun sütunu gibi dikey şekilde saklanır(Aynı veri tiplerini saklar)
+--Her bir Elemana 'Elements' denir. 
+--Her bir elemente unique bir değer ile ulaşılır
+--List ve array gibi düşünülebilir.
+-- collection_name(index) : şeklinde ulaşılır
+-- Associative Arrays, Nested Tables, Varray Types	
+
+			*****Associative Arrays (Index By Tables)*****
+			**********************************************
+-- Tek boyutlu bir dizidir. PYTHON daki Dictionary e benziyor.
+-- Key : String veya integer veri tipinde ve Unique bir değerdir.
+-- Value: Tek bir değer veya RECORD tipinde bir değerdir.
+-- İlk tanımlanırken değer atanamaz
+
+Örnek : TYPE il_bilgi IS TABLE OF varchar2(50) INDEX BY PLS_INTEGER 
+		--Bu tanımlamada, varchar2 lerden oluşan ve pls_integer ile indexlenen bir table oluşturduk.
+Örnek 2 :
+		
+				DECLARE
+					TYPE ulke IS TABLE OF varchar2(20)
+					  INDEX BY varchar2(20);
+					ulkeler ulke; -- ulke tipinde ulkeler isimli tablomusu tanımladık.
+					c_yeni_satir varchar2(6) := chr(13) || chr(10); -- yeni satırları kolayca oluşturmak için tanımlama yaptık.
+				BEGIN
+					ulkeler('TR') := 'Türkiye';
+					ulkeler('FR') := 'Fransa';
+					ulkeler('DE') := 'Almanya';
+					dbms_output.put_line(ulkeler('TR') || c_yeni_satir ||
+										 ulkeler('FR') || c_yeni_satir ||
+										 ulkeler('DE'));
+				END;
+
+Örnek 3 : 		
+				DECLARE 
+					TYPE dep_table IS TABLE OF departman%ROWTYPE INDEX BY PLS_INTEGER;
+					t_dept dep_table;
+				BEGIN
+					FOR i IN 1..10 LOOP -- DÖNGÜNÜN YARDIMIYLA BİRDEN FAZLA SATIRI DEĞER OLARAK ATAMASINI YAPTIK
+						SELECT * INTO t_dept(i) FROM departman WHERE dept_id = 100 + i;
+					END LOOP;
+					dbms_output.put_line(dep_table(5).dept_id ||' '|| dep_table(5).dept_dept_ismi);
+				END;
+				
+Örnek 4 : 	--Alttaki örnekteki gibi TABLE içine Record verilerde konulabilir.
+				DECLARE 
+					TYPE per_bilgi_type IS RECORD 
+					(	id pls_integer,
+						isim varchar2(20),
+						maas number);
+					TYPE personeller_type IS TABLE OF per_bilgi_type INDEX BY pls_integer;
+					v_perss personeller_type;
+					
+					*****COLLECTION METODLARI*****
+					******************************
+					
+EXISTS / EXISTS(n): Element varsa True döner.
+COUNT : Element sayısını döner.
+FIRST : İlk (en küçük) index numarasını döner. NULL dönerse boş demektir.
+LAST : Son (en büyük) index numarasını döner. NULL dönerse boş demektir.
+PRIOR(n) : n indexli elementten önceki elementin index numarasını döner. 
+NEXT(n) : n indexli elementten sonra elementin index numarasını döner. 
+DELETE : Tüm elementleri siler
+	DELETE(n) : n indexli elementi siler.
+	DELETE(m,n) : m-n arasındaki elementleri siler.
+EXTEND : Bir Elemanlık yer açılır. --NESTED TABLE ve VARRAY tiplerinde kullanılır.
+	EXTEND(n) : n sayısı kadarlık yer açılır
+	EXTEND(i,n) : i nolu elementten itibaren n kadar yer açılır.
+
+Örnek : t_ulkeler.COUNT
+		t_ulkeler.EXISTS('FR') --FR indexli değer varsa TRUE
+		t_ulkeler.NEXT('TR')
+		t_ulkeler.DELETE('DE')
+
+LOOP Örnek : 
+				v_index = t_ulkeler.first;
+				WHILE v_index IS NOT NULL LOOP
+					dbms_output.put_line(t_ulkeler(index))
+					v_index := t_ulkeler.next(v_index));
+				END LOOP;
+
+					*****Nested Tables*****
+					***********************
+-- Database tablolarındaki kolon tipleri gibi kullanılırlar.
+-- Başlangıç değerleri (initialize) verilmelidir.
+-- İndex 1 den başlar.
+-- Bir değerler kümesidir. Index by ifadesi yoktur.
+-- Element sayısı sınırı yoktur. İstendiği zaman arttırılabilir. (MAX 2GB)
+-- DB tablo kolonu ile ilişkilendirilebilir.
+-- Aynı anda sahip olan varray tipini constructor kullanarak başlatabiliriz.
+
+Örnek : 	DECLARE
+				TYPE isim_type IS TABLE OF varchar2(20);
+				v_isimler isim_type;
+			BEGIN
+				v_isimler := isim_type('Ahmet', 'Mehmet', 'Furkan'); --initialize ettik
+				v_isimler.extend; --bir elemanlık yer açtık
+				v_isimler(v_isimler.count) := 'Yalçın'; --yer açtıktan sonra son eleman indexine yeni veri ekledik.
+				
+				FOR i IN v_isimler.first..v_isimler.last LOOP
+					dbms_output.put_line(v_isimler(i));
+				END LOOP;
+			END;
+			
+					
+							*****Varrays (Variable Sized Arrays)*****
+							***********************
+-- Element sayısı sınırlandırılmıştır. Tek boyutlu dizidir.
+-- İndex 1 den başlar.
+-- Bir değere ulaşılırken klasik index mantığı kullanılır.
+-- Element sayısı sınırı yoktur. İstendiği zaman arttırılabilir. (MAX 2GB)
+-- Aynı anda sahip olan varray tipini constructor kullanarak başlatabiliriz.
+-- DB tablo kolonu ile ilişkilendirilebilir.
+
+Örnek : 	DECLARE
+				TYPE t_name_type IS VARRAY(2)-- Burdaki '2', dizimizde bulunacak eleman sayısıdır.
+					OF varchar2(20) NOT NULL;
+				t_names t_name_type := t_name_type('Yalçın','Ahmet');
+				t_snames t_name_type := t_name_type();
+			BEGIN
+				dbms_output.put_line('İsim Sayısı :' || t_names.count()); --Çıktı olarak 2 verir
+				dbms_output.put_line('Soyisim Sayısı :' || t_snames.count()); --Çıktı olarak 0 verir
+				dbms_output.put_line('İlk İsim :' || t_names(1));
+				
+				--t_snames(1) := 'Yetginoğlu'; == Bu satır hata verir çünkü yeni eleman eklemeden önce EXTEND edip yer açmalıyız.
+				t_snames.extend(2);
+				dbms_output.put_line('Soyisim Sayısı :' || t_snames.count()); --Çıktı olarak 2 verir
+				t_snames(1) := 'Yetginoğlu';
+				t_snames(2) := 'Terzi';
+			END;
+									*****CURSOR*****
+									****************
+--Select yada DML İşlemlerinin gerçekleştiği belleği tutan pointerları saklar
+-- Implicit : PL/SQL tarafından oluşturulan ve yönetilenlerdir. Direk erişim sağlanamaz
+-- Explicit : Yazılımcı tarafından oluşturulup yönetilir. SQL içindeki her bir satıra doğrudan erişebilir. DECLARE de tanımlanır.
+SQL%ISOPEN : BOOLEAN -> Cursor açılabildiğinde True alır.
+SQL%FOUND : BOOLEAN -> EN AZ BİR KAYIT GELMİŞTİR
+SQL%NOTFOUND : BOOLEAN -> BİR KAYIT DAHİ GELMEMİŞTİR
+SQL%ROWCOUNT : INTEGER -> SQL DEN DÖNEN KAYIT SAYISIDIR  -- En son çalıştırmış olduğumuz SQL deki etkilenen kayıt sayısını verir.
+
+				
+				*****IMPLICIT*****
+				
+--!!!! SELECT TEN KAYIT DÖNMEZSE, SQL%NOTFOUND İLE YAKALAYAMAYIZ VE HATA ALIRIZ !!!!
+--Genellikle DML komutları ile kullanılırlar.
+
+Örnek : 	DECLARE
+				v_sayi NUMBER;
+			BEGIN
+				UPDATE konum SET konum_adi = 'İstanbul Avcılar' WHERE konum_id = 5;
+				
+				v_sayi := SQL%ROWCOUNT --Etkilenen kayıtların adetini döndürür
+				
+				IF SQL%FOUND THEN --Etkilenen kayıt varsa TRUE döndürür
+					dbms_output.put_line('Etkilenen kayıt sayısı :' || v_sayi);
+				ELSE
+					dbms_output.put_line('Kayıt bulunamadı');
+				END IF;
+			END;
+			
+				*****EXPLICIT*****
+				
+--Yazılımcı tarafından oluşturulur ve yönetilir.
+--Declare kısmında tanımlanır
+--Genellikle birden fazla satıra sahiptirler. Buna 'active set' denir.
+--For döngüsü ile her bir satır üzerinde işlem yapılabilir.
+-- !!!!!!!!!    1. Declare İçindeki Tanımlamalar
+-- !!!!!!!!!	2. Open ile cursor u açmalıyız
+-- !!!!!!!!!    3. Cursor daki değerlerin FETCH edilmesi.
+-- !!!!!!!!!	4. Close ile cursor u kapatma.  -> Blok sonlandığında otomatik olarak kapanır ama 
+												--Performans açısından elle kapatmak büyük önem taşır.
+
+Kullanım Örneği (Tek Satır): 	DECLARE
+									CURSOR c_personel IS
+									  SELECT ad, soyad FROM personel
+									  WHERE personel_id = 5020;
+									  
+									 v_ad personel.ad%type;
+									 v_soyad personel.soyad%type;
+								BEGIN
+									OPEN c_personel;
+									FETCH c_personel INTO v_ad, v_soyad;
+									dbms_output.put_line(v_ad ||' '|| v_soyad);
+									CLOSE c_personel;
+								END;
+
+
+
+Kullanım Örneği (Çok Satır): 
+								DECLARE
+									CURSOR c_personel IS
+									  SELECT ad, soyad FROM personel
+									  WHERE unvan = 'UZMAN';
+									  
+									  v_ad personel.ad%type;
+									  v_soyad personel.soyad%type;
+								BEGIN
+									OPEN c_personel;
+									LOOP
+										FETCH c_personel INTO v_ad, v_soyad;
+										EXIT WHEN c_personel%NOTFOUND;
+										dbms_output.put_line(v_ad ||' '|| v_soyad);
+									END LOOP;
+									CLOSE c_personel;
+								END;
+								
+Kullanım Örneği (Çok Satır - Record): 
+								DECLARE
+									CURSOR c_personel IS
+									  SELECT ad, soyad FROM personel
+									  WHERE unvan = 'UZMAN';
+									  
+									  v_per_record c_personel%ROWTYPE;
+								BEGIN
+									OPEN c_personel;
+									LOOP
+										FETCH c_personel INTO v_per_record;
+										EXIT WHEN c_personel%NOTFOUND;
+										dbms_output.put_line(v_personel.ad ||' '|| v_personel.soyad);
+									END LOOP;
+									CLOSE c_personel;
+								END;
+								
+!!!!!! For Loop ile Cursor Kullanımı -- Aşağıda gözüktüğü gibi, Open-Fetch-Close-Exit-Record tipi tanımlama işlemleri otomatik olarak yapılır
+									-- Pythondaki for döngüsü kullanımına benzer şekilde tüm satırları tek tek dolaşır.
+
+								DECLARE
+									CURSOR c_personel IS
+									  SELECT ad, soyad FROM personel
+									  WHERE unvan = 'UZMAN';
+								BEGIN
+									FOR v_personel IN c_personel LOOP
+										dbms_output.put_line(v_personel.ad ||' '|| v_personel.soyad);
+									END LOOP;
+								END;
+
+!!!!! Çok daha basit kullanımı(Alt Sorgu) : -- Declear içinde tanımlama yapmaya ihtiyaç duymadan, direk SQL kodunu yazabiliyoruz.								
+								FOR v_row IN (SELECT * FROM konum) LOOP
+									dbms_output.put_line(v_row.konum_id ||' '|| v_row.konum_adi);
+								END LOOP;
+
+CURSOR a Parametre vermek : -- Cursorumuzun sonradan farklı amaçlarla, birden fazla kullanılabilmesine olanak sağlar.
+
+								DECLARE
+									CURSOR c_personel (cv_unvan varchar2) IS --- CURSOR c_personel (cv_maas1 number, cv_maas2 number)
+									  SELECT ad, soyad FROM personel			--Yukarıdaki şekilde birden fazla parametre alması sağlanır.
+									  WHERE unvan = cv_unvan;
+								BEGIN
+									FOR v_personel IN c_personel('UZMAN') LOOP
+										dbms_output.put_line(v_personel.ad ||' '|| v_personel.soyad);
+										EXIT WHEN c_personel%ROWCOUNT > 5;
+									END LOOP;
+									
+									FOR v_personel IN c_personel('MÜDÜR') LOOP
+										dbms_output.put_line(v_personel.ad ||' '|| v_personel.soyad);
+										EXIT WHEN c_personel%ROWCOUNT > 5;
+									END LOOP;
+								END;
+
+		
+											*****FOR UPDATE İFADESİ*****
+											****************************
+--Değiştirilmek istenen tablolardaki kayıtlar kontrol altına alınıp başka kullanıcı tarafından müdahale edilmesi istenmiyorsa kullanılır.
+NOWAIT : İlgili satırlar başka bir session tarafından kilitlendiğinde Oracle hemen hata verir. --Karşı Tarafa
+WAIT n : İlgili session kilitlendiğinde 'n' saniye bekler. -- Karşı taraf
+-- Commit ya da Rollback yapasıya kadar kitli kalır.
+
+Örnek : 		SELECT personel_id, ad, soyad, maas FROM personel 
+				WHERE unvan = 'UZMAN'
+				FOR UPDATE OF maas NOWAIT;   ---> Burdaki satırda 'maas' isimli sütunu kitlemek istediğimizi belirtiyoruz.
+				
+				
+										*****WHERE CURRENT OF*****
+										**************************
+-- Delete yada Update için Cursor la beraber kullanılır.
+-- Cursor içinde gelen kayıtlar üzerinde değişiklik yapabilmek için pratik bir yöntem sunar.
+-- For Update ile beraber kullanılır.
+-- Cursor içerisindeki o anda aktif olan satırın üzerinde işlem yapılmasını sağlar.
+
+								DECLARE
+									CURSOR c_personel (cv_unvan varchar2) IS
+									  SELECT ad, soyad FROM personel
+									  WHERE unvan = cv_unvan
+									  FOR UPDATE;
+								BEGIN
+									FOR rows_personel IN c_personel('UZMAN') LOOP
+										UPDATE personel SET maas = maas * 1.25
+										  WHERE CURRENT OF c_personel;
+									END LOOP;
+								END;				
+
+									*****EXCEPTION Handling(Hata Yönetme)*****
+									******************************************
+-- Çalıştığı blok içersinde geçerlidir ve ona göre yönetilir.
+-- Hata yakalandığında genellikle rollback yapılır.
+Internally(Dahili) : ORA-n Hataları, Sistem tarafından yayınlanır. Exception bloğunda yakalanabilir.
+Predefined(Önceden tanımlanmış) : Hata ismi verilerek exception bloğunda yakalanabilir. Ör: too_many_rows.
+User Defined(Kullanıcı Tanımlamış) : Uygulama içinde kullanıcı tarafından tanımlanır. Özel isim verilerek yönetilebilir.
+
+Örnek (Predefined) :
+							DECLARE
+								v_name varchar2(20);
+							BEGIN
+								SELECT ad INTO v_name FROM personel  --Bu Select işlemi birden fazla satır getirdiği için hata verir.
+								  WHERE unvan = 'UZMAN';
+								dbms_output.put_line(v_name);
+								
+								EXCEPTION
+									WHEN too_many_rows THEN
+										dbms_output.put_line('Birden fazla satır geldi.');
+									WHEN others THEN  --Others sayesinde tanımlamadığımız hatalarda yakalanır.
+										dbms_output.put_line('Bilinmeyen bir hata oluştu');
+							END;
+Örnek (Internally) :
+							DECLARE 
+								e_insert_null exception; -- bir hata değişkeni oluşturduk
+								pragma exception_init(e_insert_null, -01400); --Oracle'a, Belirttiğimiz kod numarasına sahip hatayı
+							BEGIN													--bizim yöneteceğimizi söylüyoruz.
+								INSERT INTO bolgeler (bolge_kod, bolge_adi)
+								  VALUES(10,null);
+								
+								EXCEPTION
+									WHEN e_insert_null THEN
+										dbms_output.put_line('Null kayıt girişi yapamazsınız.');
+							END;
+
+Örnek (User Defined) :
+
+							DECLARE 
+								v_maas number := &maas_degeri;
+								e_maas_hatasi exception;
+							BEGIN
+								IF v_maas > 20000 THEN
+									RAISE e_maas_hatasi;
+								END IF;
+								
+								EXCEPTION
+									WHEN e_maas_hatasi THEN
+										dbms_output.put_line('Maaş Değeri 20000 den büyük');
+							END;
+								
+
+Örnek 2 (User Defined);
+					DECLARE --5 den küçük personeli olan departmanları kapatma
+						v_dep_id pls_integer := 105;
+						v_per_sayisi pls_integer;
+						e_personel_sayisi exception;
+					BEGIN
+						SELECT count(*) INTO v_per_sayisi FROM personel
+						  WHERE dept_id = v_dep_id;
+						IF v_per_sayisi < 5 THEN
+							RAISE e_personel_sayisi;
+						END IF;
+						
+						EXCEPTION
+							WHEN e_personel_sayisi THEN
+								dbms_output.put_line('Dep. No :' || v_dep_id ||
+													 ' Personel Sayisi :' || v_per_sayisi);
+					END;
+
+		
+				****Hata Yakalama - Fonksiyonlar****
+				************************************
+SQLCODE : Hata kodunu verir
+SQLERRM : Hata mesajını verir
+
+			
+							DECLARE
+								v_name varchar2(20);
+								v_ecode number;
+								v_emesg varchar2(1000);
+							BEGIN
+								SELECT ad INTO v_name FROM personel  --Bu Select işlemi birden fazla satır getirdiği için hata verir.
+								  WHERE unvan = 'UZMAN';
+								dbms_output.put_line(v_name);
+								
+								EXCEPTION
+									WHEN others THEN  --Others sayesinde tanımlamadığımız hatalarda yakalanır.
+										--rollback;
+										v_ecode := SQLCODE;
+										v_emesg := SQLERRM;
+										INSERT INTO hata_bilgileri
+										  VALUES (SYSDATE, v_ecode, v_emesg);
+							END;
+							
+							
+					*****Raise Application Error (Hata Oluşturma)*****
+--Tanımlama yapmadan uygulama içersinde manuel olara oluşturmaya yarar.
+Syntax -> 	raise_application_error(error_number, message, [True,False])
+Error_Number : (-20000, -20999)Kullanıcı isteğe bağlı hata kodları verir. Belirtilen aralıkta olmalıdır.
+Message : Verilmek istenen hata mesajı
+3. parametre : 	True -> Önceki hataların üstüne eklenir.
+				False -> Önceki tüm hataların yerini alır, Default değer budur.
+				
+Örnek : 
+						IF v_maas < 5000 THEN
+							raise_application_error(-20001, '5000 den büyük maaş girmelisiniz');
+						END IF;
+
+Örnek :
+
+								DECLARE
+									e1 exception;
+									pragma exception_init(e1, -20001);
+									e2 exception;
+									pragma exception_init(e2, -20002); -- Oracle a hata kodumuzu tanıttık.
+									hata number := 1;
+								BEGIN
+									BEGIN -- İç blok
+										IF hata = 1 THEN
+											raise_application_error(-20001, 'Hata No : 1'); -- Çıkan hata 'e1' isimli hatamız ile eşleşti
+										ELSIF hata = 2 THEN
+											raise_application_error(-20002, 'Hata No : 2');
+										END IF;
+										
+										EXCEPTION
+											WHEN e1 THEN -- 'e1' isimli çıkan hatamızı burda yakaladık.
+												dbms_output.put_line('1 : Nolu Hata Yakalandı'); 
+									END; -- İç blok sonu
+									EXCEPTION
+										WHEN e2 THEN
+											dbms_output.put_line('2 : Nolu Hata Yakalandı');
+								END;
+					
+					
+					
+					
+												******MODÜLERLEŞTİRME******
+												***************************
+
+--Büyük kod bloklarını daha küçük bloklar haline bölmektir.
+--Performans ve güvenliğe katkı sağlar. Bakımları kolaydır.
+-- Yeniden yazma zahmetinden kurtarır. 
+-> Anonymous Blocks, Procedure, Function, Package, Trigger
+
+
+							*****(PROCEDURE)Prosedür Oluşturma*****
+							***************************************
+IN : Tanımlanan değişkenin GİRDİ olacağını söylüyoruz.
+OUT : Tanımlanan değişkenin ÇIKTI olacağını söylüyoruz. 
+IN OUT : Hem girdi hemde çıktı işlemini yapar.
+
+-- Prosedürleri sıra ile vermek istemezsek (=>) işareti ile değişken isimlerine göre eşleştirme yapılabilir.
+
+
+Örnek :							
+						CREATE OR REPLACE PROCEDURE karesini_al 
+						IS
+							v_sonuc number;
+						BEGIN
+							FOR i IN 1..10 LOOP
+								v_sonuc := i**2;
+								dbms_output.put_line(i || ' karesi : ' || v_sonuc);
+							END LOOP;
+						END;
+
+Çağırma İşlemi :
+	-- Sahip olduğumuz prosedürleri ve tablo gibi nesnelerin listesini görmek için 
+				--> SELECT * FROM user_objects;
+1. Yöntem						BEGIN 
+									karesini_al; 
+								END;
+2. Yöntem		EXECUTE karesini_al;
+3. Yöntem 		EXEC karesini_al;		
+
+Örnek : 
+									CREATE OR REPLACE PROCEDURE personel_yazdir (v_unvan varchar2)
+									IS
+										
+										CURSOR c_personel IS
+											SELECT ad, soyad, maas FROM personel
+											  WHERE unvan = v_unvan;
+									BEGIN
+										FOR per_row IN c_personel LOOP
+											dbms_output.put_line(per_row.ad ||' '||
+																 per_row.soyad ||' : '||
+																 per_row.maas);
+										END LOOP;
+									END;
+		**Çağırma İşlemi : EXEC personel_yazdir('UZMAN'); --> Yukarıdaki prosedürümüz bu şekilde çağırılabilir.
+		
+			
+						****Prosedür OUT****
+Prosedür Tanımlama : 			
+							CREATE OR REPLACE PROCEDURE personel_bilgi2
+							(
+								p_personel_id in number, -- Prosedürdeki değişkenleri tanımlarken otomatik olarak 'in' dir.
+								p_ad out varchar2,  --Out olan değişkenlerin girdi olaran değilde, çıktı olacağını söylüyoruz.
+								p_maas out number
+							) IS
+							BEGIN
+								SELECT ad, maas INTO p_ad, p_maas
+								  FROM personel
+								  WHERE personel_id = p_personel_id;
+							END;
+
+Prosedürün kullanımı :  	
+							DECLARE
+								v_ad varchar2(50);
+								v_maas number;
+							BEGIN
+								personel_bilgi2(5060, v_ad, v_maas); 		--Parametreleri sırası ile vermke istemezsek aşağıdaki gibi yapılır
+								dbms_output.put_line(v_ad ||' '|| v_maas);	-- personel_bilgi2(p_ad => v_ad, p_maas => v_maas, p_personel_id => 5060)
+							END;
+							
+						****Prosedür IN OUT****		
+-- Tek farkı IN OUT yazmak ve girdiğimiz değer veya değerler işlendikten sonra bize geri gönderilir.
+
+
+										*****(FUNCTION)Fonksiyon Oluşturma*****
+										***************************************
+--Prosedürden tek farkı bir değeri RETURN ediyor olması.
+Deterministic, Result_Cache = Bu iki özellik, sabit değer döndüren fonkisyonların sonuçlarını cache de saklayarak büyük performans artışı saklar.
+							Hatta fonksiyonlar 2. çağrılışlarında, hiç bir şekilde çalışmaz, sadece cevabı Cache den çekilir.
+-- Result_Cache temizlemek için : EXEC DBMS_RESULT_CACHE.FLUSH();
+Parallel_Enable : Bir fonksiyon yada modülü çağırdığımızda işlevlerin paralel yapılmasına izin vermemizi sağlar.
+
+Tanımlama : 							
+							CREATE OR REPLACE FUNCTION f_faktoryel(p_sayi number)
+							RETURN number -- Return edilen verinin tipini belirtiyoruz.
+							IS
+								v_sonuc number default 1;
+							BEGIN
+								FOR i IN REVERSE 1..p_sayi LOOP --Faktoriyeli hesaplayan For döngümüz.
+									v_sonuc := v_sonuc * i;
+								END LOOP;
+								RETURN v_sonuc; -- değerimizi Return ediyoruz.
+							END;
+
+Kullanımı 1: 
+							DECLARE
+								v_sonuc number;
+							BEGIN
+								v_sonuc := f_faktoryel(5);
+								dbms_output.put_line(v_sonuc);
+							END;
+
+Kullanım 2: 				dbms_output.put_line(f_faktoryel(5));
+
+Kullanım 3:					SELECT f_faktoryel(5) FROM dual; -- Dual sayesinde FROM ile biyerden veri istememize gerek kalmadan sorguyu yazabildik.
+
+
+								*****Fonksiyonları SQL İçinde Kullanma*****
+								*******************************************							
+		-- Yukarı örnekteki fonksiyonu ele alıcak olursak şu şekilde örnek verilebilir		
+						
+						SELECT ad, soyad, maas, f_ucret_duzeyi(personel_id) ucret_duzeyi FROM personel;
+ 
+Örnek Tanımlama : 	
+								CREATE OR REPLACE FUNCTION f_ucret_duzeyi(p_id number)
+									RETURN varchar2
+									IS
+										v_ucret_duzey varchar2(30);
+								BEGIN
+
+									SELECT uc.aciklama INTO v_ucret_duzey-- Bu sorguda, personel tablosundaki maaşlar ile
+									  FROM personel pr, ucret_duzey uc -- ucret_duzey tablosundaki maaş aralıklarını karşılaştırıp
+									  WHERE personel_id = p_id			-- karşılık gelen aralık açıklamasını seçiyoruz.	
+										AND pr.maas BETWEEN uc.maas_alt_limit AND uc.maas_ust_limit;
+									
+									RETURN v_ucret_duzey;
+								EXCEPTION
+									WHEN no_date_found THEN
+										raise_application_error(-20002, 'Getirilecek bir değer bulunamadı.');
+										return null;
+								END; 
+								
+Örnek Kullanım : 			--Alttaki sorguda, tablodaki her personel_id için fonksiyon tarafında tek tek ücret düzeyi bulunup RETURN edilir.
+								SELECT ad,soyad,maas, f_ucret_duzeyi(personel_id) AS ucret_duzeyi  FROM personel
+								
+Örnek Kullanım : -- Her bir ücret düzeyinde kaçar adet kişi olduğunu hesaplayan sorgu.
+
+								SELECT ucret_duzeyi, count(*) adet FROM
+								(
+									SELECT f_ucret_duzeyi(personel_id) AS ucret_duzeyi
+									FROM personel
+								)
+								GROUP BY ucret_duzeyi;
+								
+Ayrı Örnek : --Bu sorguda DECODE kullanımı sayesinde ünvanlara göre kişilerin ücretinde yapılacak kesintiyi hesaplayacak SQL sorgusunu yazdık.
+					SELECT DECODE(unvan,
+								  'UZMAN', 0.05,
+								  'MÜDÜR', 0.08,
+								  'GRUP MÜDÜRÜ', 0.20,
+								  0) * maas INTO v_kesinti
+					FROM personel WHERE personel_id = p_id;
+					
+
+2. Örnek :  --2 tarih arasında ne kadar süre geçtiğini bulur
+
+						CREATE OR REPLACE FUNCTION f_date_diff
+						(
+							p_sure_tipi varchar2,
+							p_d1 date,
+							p_d2 date
+						)
+						RETURN number
+						AS
+							v_sonuc number;
+						-- p_sure_tiği değeri -> ss:Saniye, mi:Dakika, hh:Saat
+						BEGIN
+							SELECT (p_d2 - p_d1) *
+								DECODE(UPPER(p_sure_tipi),
+									'SS', 24*60*60,
+									'MI', 24*60,
+									'HH', 24,
+									NULL)
+							INTO v_sonuc FROM dual;
+							RETURN v_sonuc;
+						END;
+
+2. Örnek Kullanım : 	-- Giriş ve çıkış saatleri arasındaki farkı saat cinsinden getirdi.
+						SELECT ad, soyad, f_date_diff('HH', giris_tarihi, cikis_tarihi) gecen_sure
+						FROM personel WHERE cikis_tarihi IS NOT NULL;

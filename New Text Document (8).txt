@@ -1,0 +1,813 @@
+// https://www.w3schools.com/java/java_constructors.asp
+JDK (Java Development Kit) Developers Tools
+	->	JRE (Java Runtime Env.) Libraries & toolkits
+		-> JVM (Java Virtual Machine) runs java programs
+		
+\ : Kaçış karakteri
+\n : Alt satıra geçiş
+\t : Tab
+
+										--ÖRNEK 1--
+
+int x = 123;
+long l = 123_456L;
+float f = 3.14F;
+double y = 3.14;
+char symbol = '@';
+String deneme = "Yalçın";
+
+final double PI = 3.14159; // sonradan değiştirilemez bir değer tanımladık "final" sayesinde.
+
+System.out.println("ASD " + deneme + " " + l);
+
+Scanner scanner = new Scanner(System.in);
+
+System.out.println("What is your name?");
+String name = scanner.nextLine();
+System.out.println("Hello "+name);
+
+int age = scanner.nextInt();
+scanner.nextLine(); 
+
+System.out.println("Your age is :" + age);
+
+double friends = 10;
+friends = (int)friends / 3;
+System.out.println(friends);
+
+String word = JOptionPane.showInputDialog("Enter your name");
+JOptionPane.showMessageDialog(null, "Hello "+word);
+
+int age = Integer.parseInt(JOptionPane.showInputDialog("Enter your age"));
+JOptionPane.showMessageDialog(null, "Your age is: "+age);
+
+double height = Double.parseDouble(JOptionPane.showInputDialog("Enter your age"));
+JOptionPane.showMessageDialog(null, "Your height is: "+height);
+
+
+										--ÖRNEK 2--
+										
+double x = 3.14;
+double y = -10;
+
+double z1 = Math.max(x, y);
+double z2 = Math.min(x, y);
+double z3 = Math.abs(y); //Mutlak değer
+double z4 = Math.sqrt(16); //Kökünü alma
+double z5 = Math.round(x);
+
+
+
+Random random_value = new Random(); //Seed buraya girilebilir.
+
+int x = random_value.nextInt(6)+1; // 1-6 arası random sayı belirler.
+double y = random_value.nextDouble(); // 0.156456 gibi 0 ile 1 arasında sayılar üretir.
+
+System.out.println(y);
+
+										--IF ELSE--
+/*		 && = AND
+ * 		|| = OR
+ * 		! = NOT	   */
+
+String kelime = new String();
+kelime = "deneme";
+if(kelime.equals("deneme") && kelime == "deneme") {
+	System.out.println("Küçük Harfle Yazılmıi");
+}
+else if (kelime.equals("DENEME")) {
+	System.out.println("Büyük Harfle Yazılmış");
+}
+else if (kelime.isBlank()) {
+	System.out.println("Boş");
+}
+else {
+	System.out.println("Ortaya karışık.");
+}
+
+
+										--Switch Case--
+
+int sayi = 6;
+		
+switch (sayi) {
+	case 1:
+		System.out.println("Sayın 1");
+		break;
+	case 2:
+		System.out.println("Sayın 2");
+		break;
+	case 3:
+		System.out.println("Sayın 3");
+		break;
+	default:
+		System.out.println("Sayın Bilinmiyor.");
+		break;
+}
+
+										--While Loop--
+
+int x = 1;
+while(x<10) { //10 a kadar 1 er 1 er yazdırır.
+	System.out.println(x);
+	x++;
+}
+
+
+										--For Loop--
+
+for (int i = 0; i < 10; i+=2) { //10 a kadar 2 şer 2 şer yazdırır.
+	System.out.println(i);
+}
+	
+String kelime = "merhaba";    //kelimenin karakterlerini sırası ile yazdırıyor.
+for (int i = 0; i < kelime.length(); i++) {
+	System.out.print(kelime.charAt(i));
+}
+	
+	
+										--ARRAY (1D)--
+
+String [] cars = {"Merso", "Tofaş", "Hundai"};  // oluştururken tanımlama yapmak.
+cars[1] = "BMW";
+System.out.println(cars[0]);
+
+String [] cars2 = new String[2]; // programa kaç elemanlı array oluşturacağımızı bildirmek.
+cars2[0] = "BMW";				// Bu işlem hafızadan yer ayırır.
+cars2[1] = "Merso";
+
+for(int i = 0; i<cars.length; i++) {
+	System.out.println(cars[i]);
+}
+
+
+										--ARRAY (2D)--
+
+String[][] cars = new String[2][2];  //Bellekte yer ayırarak.
+		
+cars[0][0] = "Merso";
+cars[0][1] = "Tesla";
+cars[1][0] = "Camaro";
+cars[1][1] = "Mustang";
+
+System.out.println(cars[1][1]);
+
+String[][] cars = {		//Direk tanımlama yaparak
+				{"Merso","Tesla"},
+				{"Camaro","Mustang"}
+				};
+
+									--String Methods--
+
+ // String = a reference data type that can store one or more characters
+  //   reference data types have access to useful methods
+  
+String name = "Bro";
+
+boolean result = name.equalsIgnoreCase("bro"); //Büyük küçük uyumu olmaksızın karşılaştırma yapar
+int result = name.length(); //String uzunluğunu verir
+char result = name.charAt(0); //0. indexteki karakteri alır.
+int result = name.indexOf("o"); // ilk 'o' karakterinin indexini alır.
+boolean result = name.isEmpty(); //boş olup olmadığını kontrol eder
+String result = name.toUpperCase(); //hepsini büyük yapar
+String result = name.toLowerCase(); //hepsini küçük yapar
+String result = name.trim(); //Baştaki ve sondaki boşlukları siler.
+String result = name.replace('o', 'a'); // 'o' karakteri yerine 'a' yazar.
+
+System.out.println(result);
+
+
+									--Wrapper Classes--
+// wrapper class =  provides a way to use primitive data types as reference data types
+//     reference data types contain useful methods
+//     can be used with collections (ex.ArrayList)
+  
+//primitive  //wrapper
+//---------  //-------
+// boolean  Boolean
+// char   Character
+// int   Integer
+// double  Double
+  
+// autoboxing = the automatic conversion that the Java compiler makes between the primitive types and their corresponding object wrapper classes
+// unboxing = the reverse of autoboxing. Automatic conversion of wrapper class to primitive
+
+Boolean a = true;
+Character b = '@';
+Integer c = 12;
+Double d = 12.12;
+String e = "Bro";
+
+if(a==true){
+	System.out.println("This is true.");
+}
+
+
+									---Array List (collection)---
+// a resizable array.
+// store reference data types
+// Elements can be added and removed after complation phase.
+
+		//ArrayList<Integer> intlist = new ArrayList<Integer>();
+		//ArrayList<Dobule> doublelist = new ArrayList<Dobule>();
+		
+		ArrayList<String> food = new ArrayList<String>();
+		food.add("Pizza");
+		food.add("Hamburger");
+		food.add(0, "Kebab"); // İstediğimiz index'e ekleme yaptık.
+		food.set(1, "Lahmacun"); // İstenen indexteki değer değişti.
+		food.remove(2); // İstenen indexteki veriyi siler.
+		
+		for (int i = 0; i < food.size(); i++) {
+			System.out.println(food.get(i)); //istenen indexteki veriyi retun ediyor.
+		}
+		
+		food.clear(); //tüm verileri siler.
+
+
+									---2D Array List---
+// A dynamic list of lists.
+
+		ArrayList<ArrayList<String>> groceryList = new ArrayList<>();
+		
+		ArrayList<String> bakeryList = new ArrayList();
+		bakeryList.add("Pasta");
+		bakeryList.add("Garlic Bread");
+		bakeryList.add("Donuts");
+		
+		ArrayList<String> prodList = new ArrayList();
+		prodList.add("Tomatoes");
+		prodList.add("Zucchini");
+		prodList.add("Peppers");
+		
+		ArrayList<String> drinkList = new ArrayList();
+		drinkList.add("Sode");
+		drinkList.add("Coffee");
+		
+		groceryList.add(bakeryList);
+		groceryList.add(prodList);
+		groceryList.add(drinkList);
+		
+		System.out.println(bakeryList);
+		System.out.println(groceryList);
+		System.out.println(groceryList.get(0).get(1));
+
+
+									---FOR-EACH LOOP---
+// iterate trough the elements in an array/collection
+// i : takes value of all elements in a array/list in order.
+
+		ArrayList<String> bakeryList = new ArrayList();
+		bakeryList.add("Pasta");
+		bakeryList.add("Garlic Bread");
+		bakeryList.add("Donuts");
+		
+		String[] animals = {"cat","dog","rat","bird"};
+		
+		for (String i : animals) {
+			System.out.println(i);
+		}
+		
+		for (String i : bakeryList) {
+			System.out.println(i);
+		}
+		
+		
+										---JAVA METHODS---
+
+// void = no return.
+
+	public static void main(String[] args) {
+		
+		hello("Yalçın",1,2,3,4);
+		int result = toplama(3,4,5);
+		System.out.println("Sonuç :"+result);
+	}
+	
+	static void hello(String name, Integer...b) {
+		System.out.println("Hello "+name);
+		System.out.println(b[1]);
+	}
+	
+	static int toplama(Integer...sayilar) { // "Varargs" Tanımlaması sayesinde belirsiz sayıda değer alabilmemiz münkün oldu.
+		int toplam = 0;						// Pythondaki *args benzeri.
+		for (int sayi : sayilar) {
+			toplam += sayi;
+		}
+		return toplam;
+	}
+
+											---OVERLOADED METHODS---
+											
+	public static void main(String[] args) {
+		
+		int toplama_1 = toplama(5, 8);
+		int toplama_2 = toplama(5, 8, 5);
+		double toplama_3 = toplama(3.2, 4.0);
+	}
+	
+	static int toplama(int a, int b) {
+		return a + b;
+	}
+	static int toplama(int a, int b, int c) {
+		return a + b + c;
+	}
+	static double toplama(double a, double b) {
+		return a + b;
+	}
+	
+											---PRINTF METHOD---
+											
+// print çıktısını formatlamak için kullanılır.
+// % [flags] [precision] [width] [conversion-character]
+
+
+		boolean myBoolean = true;
+		char myChar = '@';
+		String myString = "Bro";
+		int myInt = 50;
+		double myDouble = 1000;
+		
+		// [conversion-character]
+		System.out.printf("%b",myBoolean);
+		System.out.printf("%c",myChar);
+		System.out.printf("%s",myString);
+		System.out.printf("%d",myInt);
+		System.out.printf("%f",myDouble);
+		
+		// [width]
+		// görüntülenecek minimum karakter sayısını belirtiyoruz.
+		System.out.printf("Hello %10s",myString); // Çıktı : Hello        Bro
+		System.out.printf("Hello %-10s",myString); // Çıktı : Aradaki boşluk "Bro" nun sağına gitti
+	
+		// [precision]
+		// float sayıların virgülden sonrasını ayarlamak
+		System.out.printf("Your number is : %.1f", myDouble); // virgülden sonra sadece 1 hane yazdı.
+		
+		// [flags]
+		// - : left-justify
+		// + : sayısal bir değer negatif veya pozitifse, çıktı olarak uygun işareti koyar (-50 , +50) gibi.
+		// 0 : sayısal verilerin başına veya sonuna 0 doldurur Ör çıktı : "%04d" -> "0050"
+		// , : 1000 den büyük sayılar için , ile ayırma yapar
+
+
+									------OOP - OBJECT ORIENT PROGRAMING------
+///////// Car.java ////////////
+public class Car {
+	
+	String make = "Ford";
+	String model = "Mustang";
+	int year = 1970;
+	String color = "blue";
+	double price = 95000.00;
+	
+	void drive() {
+		System.out.println("You drive the car");
+	}
+	
+	void brake(){
+		System.out.println("You step on the brake");
+	}
+}
+
+/////// Main.java /////////
+Car araba = new Car();	
+System.out.println(araba.model);
+araba.drive();
+
+										---Constructors (OOP)---
+
+/////// Human.java ///////
+public class Human {
+	
+	String name;
+	int age;
+	double weight;
+	
+	public Human(String name, int age, double weight) {
+		this.name = name;
+		this.age = age;
+		this.weight = weight;
+	}
+	
+	void eat() {
+		System.out.printf("%s is eating...\n", this.name);
+	}
+}
+
+/////// Main.java //////
+
+Human insan = new Human("Yalçın", 25, 54.3);
+
+System.out.println(insan.name);
+insan.eat();
+
+									---Variable Scope (Local, Global)---	
+
+Local : Blokların içinde tanımlanan değişken veya objelerdir. Blok içinde tanımlandıkları için dış bloklardan erişilmesi mümkün değildir.
+Global : Dış bloklarda tanımlandığı zaman, içerideki blokların hepsinden erişilmesi mümkündür.
+
+void DiceRoller(){
+	Random random = new Random();
+	int number = 0;
+	roll()
+}							// Bu örnekte, DiceRoller içinde tanımlanan objeler roll sınıfından erişilemez olduğu için hata alırız.
+void roll(){				// Bu hatanın önüne geçmek için random ve number objelerimiz dış blokta tanımlanmalıdır.
+	number = random.nextInt(6)+1;
+	System.out.println(number);
+}
+
+
+									---Overloaded Constructors (OOP)---
+
+/////// Human.java ///////
+public class Human {
+	
+	String name;
+	int age;
+	double weight;
+	
+	public Human(String name, int age, double weight) {
+		this.name = name;
+		this.age = age;
+		this.weight = weight;
+	}
+	
+	public Human(String name, int age) {
+		this.name = name;
+		this.age = age;
+	}
+}
+
+/////// Main.java //////
+
+Human insan = new Human("Yalçın", 25, 54.3);
+Human insan2 = new Human("Ahmet", 15);
+
+System.out.println(insan.name);
+System.out.println(insan2.name);
+System.out.println(insan2.weight);
+
+								---Overriding toString Method---
+
+///////// Car.java ////////////
+public class Car {
+	
+	String make = "Ford";
+	String model = "Mustang";
+	int year = 1970;
+	String color = "blue";
+	
+	public String toString(){
+		return make + "\n" + "model";
+}
+
+/////// Main.java /////////
+Car araba = new Car();	
+
+System.out.println(araba);	// override yapmamış olsaydık, sınıfın bellekteki adresi dönerdi.			
+System.out.println(araba.toString());  //Otomatik olarak toString ekleniyor o yüzden bu 2 satırda aynı işi yapar.
+// çıktı olarak Ford Mustang döner. 
+
+
+								---Array of Objects---
+// Food adınca bir java classımız olduğunu varsayarsak aşağıdaki gibi objelerini array haline getirebiliriz.
+Food[] refrigerator = new Food[3];
+		
+Food food1 = new Food("pizza");
+Food food2 = new Food("hamburger");
+Food food3 = new Food("hotdog");
+
+//Food[] refrigerator = {food1, food2, food3} Şeklindede tanımlama yapıalbilirdi.
+
+refrigerator[0] = food1;
+refrigerator[1] = food2;
+refrigerator[2] = food3;
+
+System.out.println(food1.name);
+
+
+								---Object Passing---
+
+public class Main {
+
+	public static void main(String[] args) {
+			
+		Garage garage = new Garage();
+		
+		Car car1 = new Car("BMW");
+		Car car2 = new Car("Tesla");
+		
+		garage.park(car1);  // Aşağıda tanımladığımız Car sınıfına ait bir objeyi parametre olarak başka bir sınıf'a yolladık ve içinde kullandık.
+		garage.park(car2);
+		
+	}
+}
+//************** Garage.java ***********************
+public class Garage {
+
+	void park(Car car) {
+		System.out.println("The "+car.name+" is parked in the garage");
+	}
+}//************** Car.java *************************
+public class Car {
+
+	String name;
+	
+	Car(String name){
+		this.name = name;
+	}
+
+
+								---Static Keyword---
+// Sabit olan ve herkes için aynı olan değişken/objelere denir. 
+// Statik değişkenler direk olarak sınıfın kendisine aittir ve diğer tüm üyeler için aynıdır.
+// Bu oluşturulan değişken veya metoda ulaşmak için direk olarak sınıfın adı ile ulaşmak gerekir.
+/////////// Food.java /////////
+public class Food {
+	
+	String name;
+	static int numberOfFoods;
+	
+	public Food(String name) {
+		this.name = name;
+		numberOfFoods += 1; // Her yemek objesi oluşturulduğunda artar.
+	}
+	
+	static void displayFoods() {
+		System.out.printf("You have %d food(s).\n",numberOfFoods);
+	}
+}
+
+///////// Main.java ///////////
+public static void main(String[] args) {
+
+	Food food1 = new Food("pizza");
+	Food food2 = new Food("hamburger");
+	Food food3 = new Food("hotdog");
+	
+	Food.displayFoods(); //metod çalıştıktan sonra "You have 3 food(s)." yazar.
+	System.out.println(Food.numberOfFoods);	// statik değişkenimizin değerini, yani ekrana 3 yazdırır.
+}
+
+
+										---Inheritance---
+//// Bir üst sınıfın değişkenlerini/metotlarını alt sınıflara miras bırakılmasıdır.
+//////// Vehicle.java ///////
+public class Vehicle {  // Bu sınıfın içindeki değiken ve metodları alttaki tanımlanan sınıflar miras alır ve kullanabilirler.
+	String name;
+	double speed;
+	
+	void go() {
+		System.out.println("This vehicle is moving");
+	}
+	void stop() {
+		System.out.println("This vehicle is stopped");
+	}
+}
+/////// Car.java //////
+public class Car extends Vehicle{ //extends sözcüğü ile miras alacağımız sınıfı belirleriz.
+	int wheels = 4;
+	int doors = 4;
+	
+}
+
+////// Bicycle.java //////
+public class Bicycle extends Vehicle{
+	int wheels = 2;
+	int pedals = 2;
+}
+
+////// Main.java ///////
+Car araba = new Car();
+Bicycle bisiklet = new Bicycle();
+
+araba.go(); // Bu 2 satırda miras aldığımız metodları kullanıyoruz.
+bisiklet.stop();
+
+System.out.println(araba.doors);
+System.out.println(bisiklet.pedals);
+
+araba.speed = 5.34; // Miras aldığımız metoddaki değişkene erişip değer atıyoruz.
+System.out.println(araba.speed);
+
+
+									---Method Overriding---
+// Üst bir sınıftan miras aldığımız metodu, yeni sınıfımızda tekrar tanımlayarak istediğimiz şekilde düzenleyerek onu ezmiş oluyoruz.
+//////// Animals.java //////
+public class Animals {
+	void speak() {
+		System.out.println("The animal speaks");
+	}
+}
+
+//////// Dog.java ////////
+public class Dog extends Animals{
+	@Override // Override eden metod olduğunu belirtiyoruz.
+	void speak() {
+		System.out.println("The dog barks");
+	}
+}
+
+//////// Main.java ////////
+public static void main(String[] args) {
+	Dog karabas = new Dog();
+	karabas.speak();   /// Çıktı -> The dog barks
+}
+
+								---Super Keyword---
+								
+// Miras olunan sınıfın değişkenlerine erişirken kullanılır.(this e benzer)
+// super.Metod_Adi  : şeklinde yazım ile üst sınıfımıza ait bir metoduda çağırmamız mümkündür.
+//////// Person.java ///////
+public class Person {
+	String name;
+	int age;
+	
+	public Person(String name, int age) { // Person sınıfı için consructor metodunu oluşturduk
+		this.name = name;
+		this.age = age;
+	}
+}
+
+/////// Hero.java ///////
+public class Hero extends Person{
+	String power;
+	
+	public Hero(String name, int age, String power) { 
+		super(name, age);    		// "name" ve "age" değişkenleri Super(Üst-Miras) sınıfımızda tanımlandıkları için
+		this.power = power;					// super fonksionu ile Super sınıfımızdaki constructor a ulaşıp değişkenlerimizin tanımlanmasını hallediyoruz.
+	}
+}
+
+/////// Main.java ///////
+Hero hero1 = new Hero("Batman", 42, "$$$");
+		
+System.out.println(hero1.name);		// Görüldüğü üzere, kullanım açısından bir farkı bulunmuyor.
+System.out.println(hero1.age);
+System.out.println(hero1.power);
+
+						
+								---Abstract Class---
+// Şablon görevi gören Sınıflardır. Bu sınıfta, alt sınıflarının hangi metodlara sahip olması gerektiğini söyler.
+// Abstract sınıfta tanımlanan metodlar, zorunlu olarak çocuk/alt sınıflarda da tanımlanmalıdır.
+// Binevi altındaki sınıflara şablon olan sınıf diyebiliriz
+
+
+/////// Main.java ///////
+public static void main(String[] args) {
+	
+	// abstract =  	abstract classes cannot be instantiated, but they can have a subclass
+	//				abstract methods are declared without an implementation
+	
+	//Vehicle vehicle = new Vehicle(); -> Vehicle bir abstract class olduğu için obje üretilemez.
+	Car car = new Car();
+	car.go();
+}
+
+/////// Vehicle.java ///////
+public abstract class Vehicle {
+	
+	abstract void go(); // Vehicle sınıfından miras alıcak sınıflara bu isimde bir metod tanımlamalarını zorunlu hale getirdik.
+}
+
+//////// Car.java ////////
+public class Car extends Vehicle{
+
+	@Override
+	void go() {	// Tanımlamamız zorunlu olan "go" isimdi metodu tanımladık.
+		System.out.println("The driver is driving the car");
+	}
+}
+
+								---Access Modifiers: (public, protected, private)---
+
+public: visible in all classes in all packages
+protected: visible to all classes in the same package or classes in other packages that are a subclass
+default: visible to all classes in the same package 
+private: visible only in the same class
+
+								---Encapsulation (Getter, Setter)---
+// Güvenlik açısından öneemlidir. Private değişkenlere erişirken kullanılır.
+
+/////// Car.java //////
+public class Car{
+	private String model;
+	private int year;
+	
+	Car(String model, int year) {
+		this.setModel(model); // Constructor ımızda başlangıç değeri atarken setter ları kullandık.
+		this.setYear(year);
+	}
+	
+	public String getModel() { // Model değerimizi öğrenirken çağırılan metod.
+		return model;
+	}
+	public int getYear() {
+		return year;
+	}
+	public void setModel(String model) { // Model değerimizi değiştirirken kullanılan metod.
+		this.model = model;
+	}
+	public void setYear(int year) {
+		this.year = year;
+	}
+}
+
+////// Main.java //////
+Car araba = new Car("Mustang", 1970);
+		
+System.out.println(araba.getModel()); 	//Mustang
+System.out.println(araba.getYear());	//1970
+
+araba.setYear(2010); //Setter sayesinde değerimizi güncelledik.
+System.out.println(araba.getYear());	//2010
+
+
+							
+								---Copy Objects---
+
+/////// Car.java //////  -> Bir üst örnekteki diğer "Car" kodlarını içerdiğini varsayalım.
+Car(Car x){
+	this.copy(x);
+}
+
+public void copy(Car x) {   // Car türünde gelen objenin değerlerini, o anki kullandığımız objenin değerleri üzerine yazar, kopyalar.
+	this.setMake(x.getMake());
+	this.setModel(x.getModel());
+	this.setYear(x.getYear());
+}
+
+/////// Main.java //////
+Car car1 = new Car("Camaro",2021);
+Car car2 = new Car(car1);   // Burdaki kullanımda, tanımladığımız consructor sayesinde kopyalama işlemini yaptı.
+
+//Car car2 = new Car("Mustang",2022);
+//car2.copy(car1); 			//	Burda ise car1 objemizin değerleri tanımladığımız metod sayesinde car2 üzerine kopyalandı.
+
+System.out.println(car1);	// Printlerin çıktısı farklı adresleri göstermekte. Kopyalama işlemi başarılı.
+System.out.println(car2);
+
+
+									---Interface---
+// A template that can be applied to a class.
+// similar to inheritance, but specifies what a class must/has do.
+// Classes can apply more than one interface.
+									
+public class Main {
+
+	public static void main(String[] args) {
+		
+		Fish fish = new Fish();
+		
+		fish.hunt();
+		fish.flee();
+				
+	}
+}
+//********************************************
+public interface Prey {    // interface oluşturuldu
+
+	void flee();			// bir template tanımlandı.
+}
+//********************************************
+public interface Predator {    // interface oluşturuldu
+
+	void hunt();			// bir template tanımlandı.
+}
+//********************************************
+public class Rabbit implements Prey{   // classımızın hangi interface'i kullanacağını belirliyoruz.
+
+
+	@Override
+	public void flee() {	// interfacede tanımlanan metodu override ediyoruz.
+		System.out.println("*The rabbit is fleeing*");
+		
+        }
+}
+//********************************************
+public class Hawk implements Predator{
+
+
+	@Override
+	public void hunt() {
+		System.out.println("*The hawk is hunting*");
+		
+        }
+}
+//********************************************
+public class Fish implements Prey,Predator{		// her iki interfaceden de yaralanacağımızı belirttik.
+
+
+	@Override
+	public void hunt() {		//1. interfacedeki metodu aldık
+		System.out.println("*The fish is hunting*");
+		
+	}
+
+	@Override
+	public void flee() {		//2. interfacedeki metodu aldık.
+		System.out.println("*The fish is fleeing*");
+		
+	}
+}
