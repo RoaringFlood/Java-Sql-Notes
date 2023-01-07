@@ -44,10 +44,10 @@ END;
 
 			*****TABLO KOPYALAMA*****
 Örnek :		CREATE TABLE personel_kopya AS SELECT personel_id, ad, soyad FROM personel WHERE 1=0
-
+								--Where ' i bu şekilde yapınca veri çekmesini engelliyoruz.
 			*****Yeni Satıra Geçmek*****
 Örnek :		c_yeni_satir varchar2(6) := chr(13) || chr(10); -- chr(13) ve chr(10) un birleşimi yeni satıra geçilmesini sağlar
-																--Where ' i bu şekilde yapınca veri çekmesini engelliyoruz.
+																
 
 									*****VERİ TİPLERİ*****
 									**********************
