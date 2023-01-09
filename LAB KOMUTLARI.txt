@@ -1,43 +1,4 @@
-delete from teams where LENGTH(team_name)=(select LENGTH(team_name) from teams where expired_date='06.03.2022')
 											HAFTA 2
-select first_name, last_name from emplooyees where expired_date= (Select MIN(expired_date) from teams JOIN emplooyes USING(emplooye_id)  )											
-
-
-RENTING_HISTORIES
-
-pk		*		start_date
-		*		end_date
-		*		rate
-fk1		*		actor_id
-pk,fk2	*		jewellery_code
-
-
-JEWELERRIES(JEWELERRY)
-
-pk		*		code
-		*		description
-		o 		weight
-		
-		
-ACTORS(ACTOR)		
-
-pk		*		id
-		*		first_name
-		*		last_name
-
-
-
-BOOK(#number , *title , *author , *shelf_size , #shelf_number)
-SHELF(#number , #book_number)
-HIRED_EMPLOYEE(#id , *first_name , *last_name , *hired_date)
-AGENT(*agent , *agent_address)
-
-EACH BOOK MUST LOCATED ON ONE AND ONLY ONE SHELF
-EACH SHELF MAY BE THE LOCATION FOR ONE OR MORE BOOK
-
-EACH HIRED_EMPLOYEE MUST WORK FOR ONE AND ONLY ONE AGENT
-EACH AGENT MAY HAVE ONE OR MORE HIRED_EMPLOYEE
-
 
 
 SELECT = seçmeye yarar
